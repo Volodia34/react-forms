@@ -19,13 +19,28 @@ interface FormErrors {
 }
 
 const schema = yup.object().shape({
-  name: yup.string().matches(/^[A-Z]/, 'First letter must be uppercase').required(),
+  name: yup
+    .string()
+    .matches(/^[A-Z]/, 'First letter must be uppercase')
+    .required(),
   age: yup.number().positive().integer().required(),
   email: yup.string().email().required(),
-  password: yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must be strong').required(),
-  confirmPassword: yup.string().oneOf([yup.ref('password'), undefined], 'Passwords must match').required(),
+  password: yup
+    .string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      'Password must be strong'
+    )
+    .required(),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password'), undefined], 'Passwords must match')
+    .required(),
   gender: yup.string().required(),
-  terms: yup.boolean().oneOf([true], 'You must accept the terms and conditions').required(),
+  terms: yup
+    .boolean()
+    .oneOf([true], 'You must accept the terms and conditions')
+    .required(),
   picture: yup.mixed().required(),
   country: yup.string().required(),
 });
@@ -50,7 +65,8 @@ function UncontrolledForm() {
       country: formData.get('country') as string,
     };
 
-    schema.validate(data, { abortEarly: false })
+    schema
+      .validate(data, { abortEarly: false })
       .then(() => {
         dispatch(setUncontrolledFormData(data));
         navigate('/');
@@ -93,7 +109,11 @@ function UncontrolledForm() {
           </div>
           <div className={styles['form-group']}>
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input type="password" name="confirmPassword" id="confirmPassword" />
+            <input
+              type="password"
+              name="confirmPassword"
+              id="confirmPassword"
+            />
             {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
           </div>
           <div className={styles['form-group']}>
@@ -119,7 +139,9 @@ function UncontrolledForm() {
             <input type="text" name="country" id="country" />
             {errors.country && <p>{errors.country}</p>}
           </div>
-          <button type="submit" className={styles.button}>Submit</button>
+          <button type="submit" className={styles.button}>
+            Submit
+          </button>
         </form>
       </div>
     </div>
