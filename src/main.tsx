@@ -15,7 +15,7 @@ if (rootElement) {
           <App />
         </BrowserRouter>
       </Provider>
-    </StrictMode>,
+    </StrictMode>
   );
 } else {
   console.error('Root element not found');
