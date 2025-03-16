@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import { setUncontrolledFormData } from '../../store/formSlice';
+import CountryAutocomplete from '../../components/CountryAutocomplete';
 import styles from './UncontrolledForm.module.css';
 
 interface FormErrors {
@@ -136,7 +137,7 @@ function UncontrolledForm() {
           </div>
           <div className={styles['form-group']}>
             <label htmlFor="country">Country</label>
-            <input type="text" name="country" id="country" />
+            <CountryAutocomplete name="country" />
             {errors.country && <p>{errors.country}</p>}
           </div>
           <button type="submit" className={styles.button}>

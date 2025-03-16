@@ -4,6 +4,8 @@ export interface FormData {
   name: string;
   age: number;
   email: string;
+  password: string;
+  confirmPassword: string;
   gender: string;
   terms: boolean;
   picture: string;
@@ -13,11 +15,13 @@ export interface FormData {
 interface FormState {
   uncontrolledForm: FormData | null;
   hookForm: FormData | null;
+  countries: string[];
 }
 
 const initialState: FormState = {
   uncontrolledForm: null,
   hookForm: null,
+  countries: ['Ukraine', 'Poland', 'Germany', 'France', 'USA', 'Canada'], // додати більше країн за необхідності
 };
 
 const formSlice = createSlice({
@@ -34,4 +38,5 @@ const formSlice = createSlice({
 });
 
 export const { setUncontrolledFormData, setHookFormData } = formSlice.actions;
+
 export default formSlice.reducer;

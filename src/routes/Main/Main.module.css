@@ -56,20 +56,14 @@
   transform: translateY(-3px);
 }
 
-@media (max-width: 600px) {
-  .card {
-    padding: 25px;
-  }
+.data {
+  margin-top: 20px;
+}
 
-  .title {
-    font-size: 1.6rem;
-  }
-
-  .description {
-    font-size: 0.9rem;
-  }
-
-  .btn {
-    padding: 10px;
-  }
+.tile {
+  background-color: #f1f5f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 10px;
+  text-align: left;
 }
