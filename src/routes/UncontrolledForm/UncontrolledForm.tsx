@@ -10,6 +10,7 @@ import { schema } from '../../validation/schema';
 
 interface FormErrors {
   [key: string]: string | undefined;
+
   name?: string;
   age?: string;
   email?: string;
@@ -27,12 +28,25 @@ function UncontrolledForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleChange = () => {
+    setIsSubmitting(false);
+    setErrors({});
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const formData = new FormData(formElement);
 
-    const fileInput = event.currentTarget.elements.namedItem('picture') as HTMLInputElement;
+    const fileInput = formElement.elements.namedItem(
+      'picture'
+    ) as HTMLInputElement;
     const fileList = fileInput.files;
+
+    if (!fileList) {
+      setErrors({ picture: 'Picture is required' });
+      return;
+    }
 
     const data = {
       name: formData.get('name') as string,
@@ -50,24 +64,36 @@ function UncontrolledForm() {
       setIsSubmitting(true);
       await schema.validate(data, { abortEarly: false });
 
-      const base64Picture = await toBase64(fileList![0]);
+      const base64Picture = await toBase64(fileList[0]);
 
       dispatch(
         setUncontrolledFormData({
           ...data,
           picture: base64Picture,
+          timestamp: Date.now(),
         })
       );
 
+      if (formElement) {
+        formElement.reset();
+      }
+      setErrors({});
+      console.log('Navigating to home page');
       navigate('/');
-    } catch (err: any) {
-      const validationErrors: FormErrors = {};
-      err.inner.forEach((error: yup.ValidationError) => {
-        if (error.path) {
-          validationErrors[error.path] = error.message;
-        }
-      });
-      setErrors(validationErrors);
+    } catch (err: unknown) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: FormErrors = {};
+        err.inner.forEach((error) => {
+          if (error.path) {
+            validationErrors[error.path] = error.message;
+          }
+        });
+        setErrors(validationErrors);
+        console.error('Validation errors:', validationErrors);
+      } else {
+        console.error('Unexpected error:', err);
+      }
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -78,7 +104,7 @@ function UncontrolledForm() {
     <div className={styles.wrapper}>
       <div className={styles.card}>
         <h1 className={styles.title}>Uncontrolled Form</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onChange={handleChange}>
           <div className={styles['form-group']}>
             <label htmlFor="name">Name</label>
             <input type="text" name="name" id="name" />
@@ -105,7 +131,11 @@ function UncontrolledForm() {
 
           <div className={styles['form-group']}>
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input type="password" name="confirmPassword" id="confirmPassword" />
+            <input
+              type="password"
+              name="confirmPassword"
+              id="confirmPassword"
+            />
             {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
           </div>
 
@@ -137,7 +167,14 @@ function UncontrolledForm() {
             {errors.country && <p>{errors.country}</p>}
           </div>
 
-          <button type="submit" className={styles.button} disabled={hasErrors || isSubmitting}  style={{ opacity: hasErrors || isSubmitting ? 0.5 : 1, cursor: hasErrors || isSubmitting ? 'not-allowed' : 'pointer' }}
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={hasErrors || isSubmitting}
+            style={{
+              opacity: hasErrors || isSubmitting ? 0.5 : 1,
+              cursor: hasErrors || isSubmitting ? 'not-allowed' : 'pointer',
+            }}
           >
             Submit
           </button>

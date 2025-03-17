@@ -3,16 +3,20 @@ import * as yup from 'yup';
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png'];
 const FILE_SIZE = 1024 * 1024;
 
-const isFileList = (value: any): value is FileList => {
-  return value && value instanceof FileList && value.length > 0;
+const isFileList = (value: unknown): value is FileList => {
+  return value instanceof FileList && value.length > 0;
 };
 
 export const schema = yup.object().shape({
   name: yup
     .string()
-    .matches(/^[A-Z]/, 'First letter must be uppercase')
+    .matches(/^\p{Lu}/u, 'First letter must be uppercase')
     .required('Name is required'),
-  age: yup.number().positive().integer().required('Age is required'),
+  age: yup
+    .number()
+    .min(0, 'Age must be a positive number or zero')
+    .integer()
+    .required('Age is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup
     .string()
@@ -28,7 +32,7 @@ export const schema = yup.object().shape({
   gender: yup.string().required('Gender is required'),
   terms: yup.boolean().oneOf([true], 'Accept Terms and Conditions').required(),
   picture: yup
-    .mixed()
+    .mixed<FileList>()
     .required('Picture is required')
     .test('fileSize', 'File too large', (value) => {
       if (!isFileList(value)) return false;

@@ -10,18 +10,19 @@ export interface FormData {
   terms: boolean;
   picture: string;
   country: string;
+  timestamp: number;
 }
 
 interface FormState {
-  uncontrolledForm: FormData | null;
-  hookForm: FormData | null;
+  uncontrolledForm: FormData[];
+  hookForm: FormData[];
   countries: string[];
 }
 
 const initialState: FormState = {
-  uncontrolledForm: null,
-  hookForm: null,
-  countries: ['Ukraine', 'Poland', 'Germany', 'France', 'USA', 'Canada'], // додати більше країн за необхідності
+  uncontrolledForm: [],
+  hookForm: [],
+  countries: ['Ukraine', 'Poland', 'Germany', 'France', 'USA', 'Canada'],
 };
 
 const formSlice = createSlice({
@@ -29,10 +30,10 @@ const formSlice = createSlice({
   initialState,
   reducers: {
     setUncontrolledFormData(state, action: PayloadAction<FormData>) {
-      state.uncontrolledForm = action.payload;
+      state.uncontrolledForm.push(action.payload);
     },
     setHookFormData(state, action: PayloadAction<FormData>) {
-      state.hookForm = action.payload;
+      state.hookForm.push(action.payload);
     },
   },
 });

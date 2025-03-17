@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormRegister } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,18 @@ import { setHookFormData } from '../../store/formSlice';
 import CountryAutocomplete from '../../components/CountryAutocomplete';
 import styles from './HookForm.module.css';
 
+interface FormData {
+  name: string;
+  age: number;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  gender: string;
+  terms: boolean;
+  picture: FileList;
+  country: string;
+}
+
 export default function HookForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -16,14 +28,19 @@ export default function HookForm() {
     register,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
-  } = useForm({
+  } = useForm<FormData>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
 
-  const onSubmit = async (data: any) => {
-    data.picture = await toBase64(data.picture[0]);
-    dispatch(setHookFormData(data));
+  const onSubmit = async (data: FormData) => {
+    const base64Picture = await toBase64(data.picture[0]);
+    const formDataWithTimestamp = {
+      ...data,
+      picture: base64Picture,
+      timestamp: Date.now(),
+    };
+    dispatch(setHookFormData(formDataWithTimestamp));
     navigate('/');
   };
 
@@ -34,31 +51,56 @@ export default function HookForm() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={styles['form-group']}>
             <label htmlFor="name">Name</label>
-            <input type="text" {...register('name')} id="name" placeholder="Name" />
+            <input
+              type="text"
+              {...register('name')}
+              id="name"
+              placeholder="Name"
+            />
             {errors.name && <p>{errors.name.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="age">Age</label>
-            <input type="number" {...register('age')} id="age" placeholder="Age" />
+            <input
+              type="number"
+              {...register('age')}
+              id="age"
+              placeholder="Age"
+            />
             {errors.age && <p>{errors.age.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="email">Email</label>
-            <input type="email" {...register('email')} id="email" placeholder="Email" />
+            <input
+              type="email"
+              {...register('email')}
+              id="email"
+              placeholder="Email"
+            />
             {errors.email && <p>{errors.email.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="password">Password</label>
-            <input type="password" {...register('password')} id="password" placeholder="Password" />
+            <input
+              type="password"
+              {...register('password')}
+              id="password"
+              placeholder="Password"
+            />
             {errors.password && <p>{errors.password.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input type="password" {...register('confirmPassword')} id="confirmPassword" placeholder="Confirm Password" />
+            <input
+              type="password"
+              {...register('confirmPassword')}
+              id="confirmPassword"
+              placeholder="Confirm Password"
+            />
             {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
           </div>
 
@@ -86,7 +128,12 @@ export default function HookForm() {
 
           <div className={styles['form-group']}>
             <label htmlFor="country">Country</label>
-            <CountryAutocomplete register={register} name="country" />
+            <CountryAutocomplete
+              register={
+                register as unknown as UseFormRegister<Record<string, unknown>>
+              }
+              name="country"
+            />
             {errors.country && <p>{errors.country.message}</p>}
           </div>
 
@@ -94,7 +141,10 @@ export default function HookForm() {
             type="submit"
             className={styles.button}
             disabled={!isValid || isSubmitting}
-            style={{ opacity: !isValid || isSubmitting ? 0.5 : 1, cursor: !isValid || isSubmitting ? 'not-allowed' : 'pointer' }}
+            style={{
+              opacity: !isValid || isSubmitting ? 0.5 : 1,
+              cursor: !isValid || isSubmitting ? 'not-allowed' : 'pointer',
+            }}
           >
             Submit
           </button>

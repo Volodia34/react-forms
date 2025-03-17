@@ -1,47 +1,35 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { RootState } from '../../store';
 import styles from './Main.module.css';
-
-interface FormData {
-  name: string;
-  age: number;
-  email: string;
-  gender: string;
-  country: string;
-  terms: boolean;
-  picture: string;
-  timestamp: number;
-}
+import { FormData as StoreFormData } from '../../store/formSlice'; // Import the correct FormData type
 
 function Main() {
   const { uncontrolledForm, hookForm } = useSelector(
     (state: RootState) => state.form
-  ) as { uncontrolledForm: FormData | null; hookForm: FormData | null };
-  const [newData, setNewData] = useState<'uncontrolled' | 'hook' | null>(null);
+  );
 
-  useEffect(() => {
-    if (uncontrolledForm || hookForm) {
-      if (hookForm && (!uncontrolledForm || hookForm.timestamp > uncontrolledForm.timestamp)) {
-        setNewData('hook');
-      } else if (uncontrolledForm) {
-        setNewData('uncontrolled');
-      }
-
-      const timer = setTimeout(() => setNewData(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [uncontrolledForm, hookForm]);
-
-  const renderFormData = (data: FormData) => (
+  const renderFormData = (data: StoreFormData) => (
     <div className={styles.dataTile}>
       <h3>{data.name}</h3>
-      <p><strong>Age:</strong> {data.age}</p>
-      <p><strong>Email:</strong> {data.email}</p>
-      <p><strong>Gender:</strong> {data.gender}</p>
-      <p><strong>Country:</strong> {data.country}</p>
-      <p><strong>Terms Accepted:</strong> {data.terms ? 'Yes' : 'No'}</p>
+      <p>
+        <strong>Age:</strong> {data.age}
+      </p>
+      <p>
+        <strong>Email:</strong> {data.email}
+      </p>
+      <p>
+        <strong>Password:</strong> {data.password}
+      </p>
+      <p>
+        <strong>Gender:</strong> {data.gender}
+      </p>
+      <p>
+        <strong>Country:</strong> {data.country}
+      </p>
+      <p>
+        <strong>Terms Accepted:</strong> {data.terms ? 'Yes' : 'No'}
+      </p>
       <img src={data.picture} alt="Uploaded" className={styles.picture} />
     </div>
   );
@@ -62,26 +50,18 @@ function Main() {
         </nav>
 
         <div className={styles.data}>
-          {uncontrolledForm && (
-            <div
-              className={`${styles.tile} ${
-                newData === 'uncontrolled' ? styles.newData : ''
-              }`}
-            >
+          {uncontrolledForm.map((data, index) => (
+            <div key={index} className={styles.tile}>
               <h2>Uncontrolled Form Data</h2>
-              {renderFormData(uncontrolledForm)}
+              {renderFormData(data)}
             </div>
-          )}
-          {hookForm && (
-            <div
-              className={`${styles.tile} ${
-                newData === 'hook' ? styles.newData : ''
-              }`}
-            >
+          ))}
+          {hookForm.map((data, index) => (
+            <div key={index} className={styles.tile}>
               <h2>Hook Form Data</h2>
-              {renderFormData(hookForm)}
+              {renderFormData(data)}
             </div>
-          )}
+          ))}
         </div>
       </div>
     </div>
