@@ -18,7 +18,7 @@ export default function HookForm() {
     formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(schema),
-    mode: 'onChange',
+    mode: 'onChange', // Ensure live validation is enabled
   });
 
   const onSubmit = async (data: any) => {
@@ -26,6 +26,8 @@ export default function HookForm() {
     dispatch(setHookFormData(data));
     navigate('/');
   };
+
+  console.log(errors); // Log errors to check validation state
 
   return (
     <div className={styles.wrapper}>

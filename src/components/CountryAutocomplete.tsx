@@ -8,14 +8,14 @@ interface Props {
 }
 
 export default function CountryAutocomplete({
-  register,
-  name,
-  defaultValue,
-}: Props) {
+                                              register,
+                                              name,
+                                              defaultValue,
+                                            }: Props) {
   const countries = useSelector((state: RootState) => state.form.countries);
 
   return (
-    <select {...(register ? register(name) : {})} defaultValue={defaultValue}>
+    <select {...(register ? register(name) : { name })} defaultValue={defaultValue}>
       <option value="">Select Country</option>
       {countries.map((country) => (
         <option key={country} value={country}>

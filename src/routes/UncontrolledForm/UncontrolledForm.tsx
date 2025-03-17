@@ -5,6 +5,8 @@ import * as yup from 'yup';
 import { setUncontrolledFormData } from '../../store/formSlice';
 import CountryAutocomplete from '../../components/CountryAutocomplete';
 import styles from './UncontrolledForm.module.css';
+import { toBase64 } from '../../utils/toBase64';
+import { schema } from '../../validation/schema';
 
 interface FormErrors {
   [key: string]: string | undefined;
@@ -19,39 +21,12 @@ interface FormErrors {
   country?: string;
 }
 
-const schema = yup.object().shape({
-  name: yup
-    .string()
-    .matches(/^[A-Z]/, 'First letter must be uppercase')
-    .required(),
-  age: yup.number().positive().integer().required(),
-  email: yup.string().email().required(),
-  password: yup
-    .string()
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      'Password must be strong'
-    )
-    .required(),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password'), undefined], 'Passwords must match')
-    .required(),
-  gender: yup.string().required(),
-  terms: yup
-    .boolean()
-    .oneOf([true], 'You must accept the terms and conditions')
-    .required(),
-  picture: yup.mixed().required(),
-  country: yup.string().required(),
-});
-
 function UncontrolledForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const data = {
@@ -62,25 +37,25 @@ function UncontrolledForm() {
       confirmPassword: formData.get('confirmPassword') as string,
       gender: formData.get('gender') as string,
       terms: formData.get('terms') === 'on',
-      picture: formData.get('picture') as string,
+      picture: formData.get('picture') as File,
       country: formData.get('country') as string,
     };
 
-    schema
-      .validate(data, { abortEarly: false })
-      .then(() => {
-        dispatch(setUncontrolledFormData(data));
-        navigate('/');
-      })
-      .catch((err) => {
-        const validationErrors: FormErrors = {};
-        err.inner.forEach((error: yup.ValidationError) => {
-          if (error.path) {
-            validationErrors[error.path] = error.message;
-          }
-        });
-        setErrors(validationErrors);
+    try {
+      await schema.validate(data, { abortEarly: false });
+      const base64Picture = await toBase64(data.picture);
+      const formDataWithBase64Picture = { ...data, picture: base64Picture };
+      dispatch(setUncontrolledFormData(formDataWithBase64Picture));
+      navigate('/');
+    } catch (err: any) {
+      const validationErrors: FormErrors = {};
+      err.inner.forEach((error: yup.ValidationError) => {
+        if (error.path) {
+          validationErrors[error.path] = error.message;
+        }
       });
+      setErrors(validationErrors);
+    }
   };
 
   return (
@@ -120,6 +95,7 @@ function UncontrolledForm() {
           <div className={styles['form-group']}>
             <label htmlFor="gender">Gender</label>
             <select name="gender" id="gender">
+              <option value="">Select Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
             </select>

@@ -67,3 +67,15 @@
   margin-top: 10px;
   text-align: left;
 }
+
+.newData {
+  border: 2px solid #0ea5e9;
+  background-color: #e0f7ff;
+}
+
+.dataTile {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+
