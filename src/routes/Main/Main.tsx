@@ -4,21 +4,37 @@ import { useEffect, useState } from 'react';
 import { RootState } from '../../store';
 import styles from './Main.module.css';
 
+interface FormData {
+  name: string;
+  age: number;
+  email: string;
+  gender: string;
+  country: string;
+  terms: boolean;
+  picture: string;
+  timestamp: number;
+}
+
 function Main() {
   const { uncontrolledForm, hookForm } = useSelector(
     (state: RootState) => state.form
-  );
+  ) as { uncontrolledForm: FormData | null; hookForm: FormData | null };
   const [newData, setNewData] = useState<'uncontrolled' | 'hook' | null>(null);
 
   useEffect(() => {
     if (uncontrolledForm || hookForm) {
-      setNewData(uncontrolledForm ? 'uncontrolled' : 'hook');
+      if (hookForm && (!uncontrolledForm || hookForm.timestamp > uncontrolledForm.timestamp)) {
+        setNewData('hook');
+      } else if (uncontrolledForm) {
+        setNewData('uncontrolled');
+      }
+
       const timer = setTimeout(() => setNewData(null), 3000);
       return () => clearTimeout(timer);
     }
   }, [uncontrolledForm, hookForm]);
 
-  const renderFormData = (data: any) => (
+  const renderFormData = (data: FormData) => (
     <div className={styles.dataTile}>
       <h3>{data.name}</h3>
       <p><strong>Age:</strong> {data.age}</p>

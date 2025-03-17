@@ -2,10 +2,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { schema } from '../../validation/schema.ts';
-import { toBase64 } from '../../utils/toBase64.ts';
-import { setHookFormData } from '../../store/formSlice.ts';
-import CountryAutocomplete from '../../components/CountryAutocomplete.tsx';
+import { schema } from '../../validation/schema';
+import { toBase64 } from '../../utils/toBase64';
+import { setHookFormData } from '../../store/formSlice';
+import CountryAutocomplete from '../../components/CountryAutocomplete';
 import styles from './HookForm.module.css';
 
 export default function HookForm() {
@@ -15,10 +15,10 @@ export default function HookForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
-    mode: 'onChange', // Ensure live validation is enabled
+    mode: 'onChange',
   });
 
   const onSubmit = async (data: any) => {
@@ -27,8 +27,6 @@ export default function HookForm() {
     navigate('/');
   };
 
-  console.log(errors); // Log errors to check validation state
-
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
@@ -36,56 +34,31 @@ export default function HookForm() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={styles['form-group']}>
             <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              {...register('name')}
-              id="name"
-              placeholder="Name"
-            />
+            <input type="text" {...register('name')} id="name" placeholder="Name" />
             {errors.name && <p>{errors.name.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="age">Age</label>
-            <input
-              type="number"
-              {...register('age')}
-              id="age"
-              placeholder="Age"
-            />
+            <input type="number" {...register('age')} id="age" placeholder="Age" />
             {errors.age && <p>{errors.age.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              {...register('email')}
-              id="email"
-              placeholder="Email"
-            />
+            <input type="email" {...register('email')} id="email" placeholder="Email" />
             {errors.email && <p>{errors.email.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              {...register('password')}
-              id="password"
-              placeholder="Password"
-            />
+            <input type="password" {...register('password')} id="password" placeholder="Password" />
             {errors.password && <p>{errors.password.message}</p>}
           </div>
 
           <div className={styles['form-group']}>
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              {...register('confirmPassword')}
-              id="confirmPassword"
-              placeholder="Confirm Password"
-            />
+            <input type="password" {...register('confirmPassword')} id="confirmPassword" placeholder="Confirm Password" />
             {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
           </div>
 
@@ -117,7 +90,12 @@ export default function HookForm() {
             {errors.country && <p>{errors.country.message}</p>}
           </div>
 
-          <button type="submit" className={styles.button} disabled={!isValid}>
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={!isValid || isSubmitting}
+            style={{ opacity: !isValid || isSubmitting ? 0.5 : 1, cursor: !isValid || isSubmitting ? 'not-allowed' : 'pointer' }}
+          >
             Submit
           </button>
         </form>

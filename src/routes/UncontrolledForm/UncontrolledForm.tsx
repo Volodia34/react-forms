@@ -25,10 +25,15 @@ function UncontrolledForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+
+    const fileInput = event.currentTarget.elements.namedItem('picture') as HTMLInputElement;
+    const fileList = fileInput.files;
+
     const data = {
       name: formData.get('name') as string,
       age: Number(formData.get('age')),
@@ -37,15 +42,23 @@ function UncontrolledForm() {
       confirmPassword: formData.get('confirmPassword') as string,
       gender: formData.get('gender') as string,
       terms: formData.get('terms') === 'on',
-      picture: formData.get('picture') as File,
+      picture: fileList,
       country: formData.get('country') as string,
     };
 
     try {
+      setIsSubmitting(true);
       await schema.validate(data, { abortEarly: false });
-      const base64Picture = await toBase64(data.picture);
-      const formDataWithBase64Picture = { ...data, picture: base64Picture };
-      dispatch(setUncontrolledFormData(formDataWithBase64Picture));
+
+      const base64Picture = await toBase64(fileList![0]);
+
+      dispatch(
+        setUncontrolledFormData({
+          ...data,
+          picture: base64Picture,
+        })
+      );
+
       navigate('/');
     } catch (err: any) {
       const validationErrors: FormErrors = {};
@@ -55,8 +68,11 @@ function UncontrolledForm() {
         }
       });
       setErrors(validationErrors);
+      setIsSubmitting(false);
     }
   };
+
+  const hasErrors = Object.values(errors).some(Boolean);
 
   return (
     <div className={styles.wrapper}>
@@ -68,30 +84,31 @@ function UncontrolledForm() {
             <input type="text" name="name" id="name" />
             {errors.name && <p>{errors.name}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="age">Age</label>
             <input type="number" name="age" id="age" />
             {errors.age && <p>{errors.age}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="email">Email</label>
             <input type="email" name="email" id="email" />
             {errors.email && <p>{errors.email}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="password">Password</label>
             <input type="password" name="password" id="password" />
             {errors.password && <p>{errors.password}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              id="confirmPassword"
-            />
+            <input type="password" name="confirmPassword" id="confirmPassword" />
             {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="gender">Gender</label>
             <select name="gender" id="gender">
@@ -101,22 +118,27 @@ function UncontrolledForm() {
             </select>
             {errors.gender && <p>{errors.gender}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="terms">Accept Terms and Conditions</label>
             <input type="checkbox" name="terms" id="terms" />
             {errors.terms && <p>{errors.terms}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="picture">Upload Picture</label>
             <input type="file" name="picture" id="picture" />
             {errors.picture && <p>{errors.picture}</p>}
           </div>
+
           <div className={styles['form-group']}>
             <label htmlFor="country">Country</label>
             <CountryAutocomplete name="country" />
             {errors.country && <p>{errors.country}</p>}
           </div>
-          <button type="submit" className={styles.button}>
+
+          <button type="submit" className={styles.button} disabled={hasErrors || isSubmitting}  style={{ opacity: hasErrors || isSubmitting ? 0.5 : 1, cursor: hasErrors || isSubmitting ? 'not-allowed' : 'pointer' }}
+          >
             Submit
           </button>
         </form>

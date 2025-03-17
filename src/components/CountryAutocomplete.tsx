@@ -17,7 +17,7 @@ export default function CountryAutocomplete({
   return (
     <select {...(register ? register(name) : { name })} defaultValue={defaultValue}>
       <option value="">Select Country</option>
-      {countries.map((country) => (
+      {countries.map((country: string) => (
         <option key={country} value={country}>
           {country}
         </option>
