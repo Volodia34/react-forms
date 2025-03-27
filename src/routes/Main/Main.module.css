@@ -1,0 +1,90 @@
+.wrapper {
+  min-height: 100vh; /* Змінено з height на min-height */
+  display: flex;
+  flex-direction: column; /* Додаємо вертикальне розташування */
+  align-items: center;
+  justify-content: flex-start; /* Вирівнюємо елементи по верху */
+  background-color: #f8fafc;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+  overflow-y: auto;
+  padding: 20px; /* Додаємо відступи */
+}
+
+.card {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  margin: 20px; /* Додаємо відступи між картками */
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.description {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.btn {
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #0ea5e9;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background-color: #0284c7;
+  transform: translateY(-3px);
+}
+
+.data {
+  margin-top: 20px;
+}
+
+.tile {
+  background-color: #f1f5f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 10px;
+  text-align: left;
+  transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+.newData {
+  border: 2px solid #0ea5e9;
+  background-color: #e0f7ff;
+}
+
+.dataTile {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.picture {
+  max-width: 100%;
+  margin-top: 10px;
+  border-radius: 8px;
+}
